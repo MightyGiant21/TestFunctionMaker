@@ -1,65 +1,114 @@
 use std::{fs::File, io::Read};
 
-pub struct Files {
-    pub file_to_read: File, 
-    pub test_file: File,
-    pub contents: Vec<char>
+#[derive(Debug)]
+pub struct TestObj {
+    pub contents: String,
+    pub number_of_functions_in_module: u64,
+    pub names_of_functions: Vec<String>,
 }
 
-impl Files {
-    pub fn create_test_file(rom: &str) -> Files {
-        // Create a test file
-        let test_file = File::create("./src/tests.rs").unwrap();
-        let file_to_read = File::open(rom).unwrap();
-        
-        Files {
-            file_to_read: file_to_read,
-            test_file: test_file,
-            contents: Vec::new()
+impl TestObj {
+    pub fn init_obj(path: &str) -> TestObj {
+        let mut file_to_read = File::open(path).unwrap();
+        let mut contents = String::new();
+
+        file_to_read.read_to_string(&mut contents).unwrap();
+
+        TestObj {
+            contents: contents,
+            number_of_functions_in_module: 0,
+            names_of_functions: Vec::new(),
         }
     }
-   
-    pub fn generate_test_file_skeleton(&mut self) {
-        let boilerplate = String::from("#[cfg(test)]\nmod tests {\n
-        \n}");
-        self.contents = boilerplate.chars().collect();
-    }
 
-    pub fn convert_contents_to_string(&mut self) -> String {
-        let mut chars_as_string = String::new();
-        
-        for i in 0..self.contents.len() {
-            chars_as_string.push(self.contents[i])
-        }
+    pub fn get_names_and_how_many_functions_in_module(&mut self) {
+        let mut function_name = String::new();
 
-        chars_as_string
-    }
-
-    pub fn insert_functions_into_test_file(&mut self) {
-        // Find the index for the start of each function
-        // Find the index of the end of the function. Look for \n
-        // Iterate over the function and save the string into a variable
-        // Push the string to the test file
-
-        // Push contents of file into a string
-        let mut string = String::new();
-        let mut start_and_end_index: Vec<(u8, u8)> = Vec::new();
-        self.file_to_read.read_to_string(&mut string).unwrap();
-
-        // Get start and end index of function
-        // Can use this to calc length of chars
-        for (i, char) in string.chars().enumerate()  {
+        // Iterate over contents to find a function
+        for (i, char) in self.contents.chars().enumerate() {
             if char == 'f' {
-                if string.chars().next() == Some('n') {
-                    if string.chars().next() == Some(' ') {
-                        start_and_end_index[0].0 = i as u8
+                if self.contents.chars().nth(i + 1).unwrap() == 'n' {
+                    if self.contents.chars().nth(i + 2).unwrap() == ' ' {
+                        self.number_of_functions_in_module += 1;
+                        let mut counter = 0;
+                        function_name.push_str("    ");
+                        while self.contents.chars().nth(i + counter).unwrap() != '{' {
+                            // Push each char into a string
+                            function_name.push(self.contents.chars().nth(i + counter).unwrap());
+                            counter += 1;
+                        }
+                        function_name.push_str("{ \n \n    } \n\n");
+                        self.names_of_functions.push(function_name.clone());
+                        function_name.drain(..);
                     }
                 }
             }
+        }
+    }
 
-            if char == '{' {
-                start_and_end_index[0].1 = i as u8
+    pub fn add_test_marcos_to_functions(&mut self) {
+        let test_marco = String::from("    #[test]\n");
+
+        // Add macro to each function name
+        // Function name is a vec of strings
+        // Index the vec and insert test to each string
+        for i in 0..self.names_of_functions.len() {
+            if i < self.names_of_functions.len() {
+                self.names_of_functions.insert(i * 2, test_marco.clone());
             }
         }
+    }
+
+    pub fn add_skeleton_to_test_functions(&mut self) {
+        let mut boilerplate = String::from("#[cfg(test)]\nmod tests {\n");
+        // Push functions into test skeleton
+        for i in 0..self.names_of_functions.len() {
+            boilerplate.push_str(&self.names_of_functions[i])
+        }
+        boilerplate.push_str("\n}");
+        self.contents = boilerplate;
+    }
+
+    // // // // // // // // // // // // // Helpers for testing // // // // // // // // // // // // //
+
+    pub fn get_names_and_how_many_functions_in_module_for_tdd(&mut self) -> Vec<String> {
+        let mut function_name = String::new();
+
+        // Iterate over contents to find a function
+        for (i, char) in self.contents.chars().enumerate() {
+            if char == 'f' {
+                if self.contents.chars().nth(i + 1).unwrap() == 'n' {
+                    if self.contents.chars().nth(i + 2).unwrap() == ' ' {
+                        self.number_of_functions_in_module += 1;
+                        let mut counter = 0;
+                        function_name.push_str("    ");
+                        while self.contents.chars().nth(i + counter).unwrap() != '{' {
+                            // Push each char into a string
+                            function_name.push(self.contents.chars().nth(i + counter).unwrap());
+                            counter += 1;
+                        }
+                        function_name.push_str("{ \n \n} \n");
+                        self.names_of_functions.push(function_name.clone());
+                        function_name.drain(..);
+                    }
+                }
+            }
+        }
+
+        self.names_of_functions.clone()
+    }
+
+    pub fn add_test_marcos_to_functions_for_tdd(&mut self) -> Vec<String> {
+        let test_marco = String::from("    #[test]\n");
+
+        // Add macro to each function name
+        // Function name is a vec of strings
+        // Index the vec and insert test to each string
+        for i in 0..self.names_of_functions.len() {
+            if i < self.names_of_functions.len() {
+                self.names_of_functions.insert(i * 2, test_marco.clone());
+            }
+        }
+        self.names_of_functions.clone()
     }
 }

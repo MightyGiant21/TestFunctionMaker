@@ -1,25 +1,39 @@
-mod module;
 mod file_generator;
+mod module;
+mod testing;
 mod tests;
 
+use std::fs::File;
 use std::io::Write;
 
-use crate::file_generator::Files;
+use crate::file_generator::TestObj;
 
 fn main() {
-    let mut test_file = Files::create_test_file("./src/module.rs");
-    test_file.generate_test_file_skeleton();
+    let mut test_obj = TestObj::init_obj("./src/module.rs");
+    let mut test_file = File::create("./src/tests.rs").unwrap();
 
-    let contents = test_file.convert_contents_to_string();
+    test_obj.get_names_and_how_many_functions_in_module();
+    test_obj.add_test_marcos_to_functions();
+    test_obj.add_skeleton_to_test_functions();
 
-    writeln!(test_file.test_file, "{}", contents).unwrap();
+    writeln!(test_file, "{}", test_obj.contents).unwrap();
 }
 
-fn add_test_marco_to_function(contents: &str) -> String {
-    let mut test_macro = String::from("#[test]\n");
-    let contents = contents.to_owned();
+// Create a test.rs file
 
-    test_macro.push_str(&contents);
+// Read contents of module to be tested into a string or vec
 
-    test_macro
-}
+// Find out how many functions are in the module
+
+// Find out how many chars are in each function and store as name
+// Create a test block which pushes a test macro then pushes a function name. Repeat for each function
+// Push all blocks into one large block
+// Push large block into test skeleton
+// Write it all into test.rs
+
+// // // // // // // // // // // // // // // Struct // // // // // // // // // // // // // // // // //
+
+// test_file: File
+// content: String
+// number_of_functions_in_module: u64
+// names_of_functions: Vec<string>
