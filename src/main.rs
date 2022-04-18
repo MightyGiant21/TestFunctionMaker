@@ -3,14 +3,20 @@ mod module;
 mod testing;
 mod tests;
 
+use std::env;
 use std::fs::File;
 use std::io::Write;
 
 use crate::file_generator::TestObj;
 
 fn main() {
-    let mut test_obj = TestObj::init_obj("./src/module.rs");
-    let mut test_file = File::create("./src/tests.rs").unwrap();
+    let module_to_test: Vec<String> = env::args().collect();
+    let module_path = &module_to_test[1];
+
+    let mut test_obj = TestObj::init_obj(&module_path);
+    let test_file_path = &module_to_test[2];
+
+    let mut test_file = File::create(test_file_path).unwrap();
 
     test_obj.get_names_and_how_many_functions_in_module();
     test_obj.add_test_marcos_to_functions();
