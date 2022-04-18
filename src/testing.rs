@@ -17,12 +17,12 @@ mod testing {
                         test_obj.number_of_functions_in_module += 1;
                         let mut counter = 0;
                         function_name.push_str("    ");
-                        while contents.chars().nth(i + counter).unwrap() != '{' {
-                            // Push each char into a string
+                        while contents.chars().nth(i + counter).unwrap() != '(' {
+                            // Push each char into a string unless it an arg
                             function_name.push(contents.chars().nth(i + counter).unwrap());
                             counter += 1;
                         }
-                        function_name.push_str("{ \n \n} \n\n");
+                        function_name.push_str("() { \n \n} \n\n");
                         test_obj.names_of_functions.push(function_name.clone());
                         function_name.drain(..);
                     }

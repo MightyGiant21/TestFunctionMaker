@@ -32,12 +32,12 @@ impl TestObj {
                         self.number_of_functions_in_module += 1;
                         let mut counter = 0;
                         function_name.push_str("    ");
-                        while self.contents.chars().nth(i + counter).unwrap() != '{' {
+                        while self.contents.chars().nth(i + counter).unwrap() != '(' {
                             // Push each char into a string
                             function_name.push(self.contents.chars().nth(i + counter).unwrap());
                             counter += 1;
                         }
-                        function_name.push_str("{ \n \n    } \n\n");
+                        function_name.push_str("() { \n \n    } \n\n");
                         self.names_of_functions.push(function_name.clone());
                         function_name.drain(..);
                     }
