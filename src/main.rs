@@ -1,7 +1,6 @@
 mod file_generator;
 mod module;
 mod testing;
-mod tests;
 
 use std::env;
 use std::fs::File;
