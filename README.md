@@ -1,7 +1,7 @@
 Automatic test file generator for when you have lots of functions to test.
 ========
 
-Download test_maker from the release folder and run with 2 args. First arg is the file eith the functions inside it, the second arg is where you want the test module to be.
+Clone the repo, build in release mode and then run test_maker from the release folder. First arg is the file eith the functions inside it, the second arg is where you want the test module to be.
 
 Example
 ====
