@@ -26,9 +26,9 @@ impl TestObj {
 
         // Iterate over contents to find a function
         for (i, char) in self.contents.chars().enumerate() {
-            if char == 'f' {
-                if self.contents.chars().nth(i + 1).unwrap() == 'n' {
-                    if self.contents.chars().nth(i + 2).unwrap() == ' ' {
+            if char == 'f' &&
+            self.contents.chars().nth(i + 1).unwrap() == 'n' &&
+            self.contents.chars().nth(i + 2).unwrap() == ' ' {
                         self.number_of_functions_in_module += 1;
                         let mut counter = 0;
                         function_name.push_str("    ");
@@ -40,10 +40,8 @@ impl TestObj {
                         function_name.push_str("() { \n \n    } \n\n");
                         self.names_of_functions.push(function_name.clone());
                         function_name.drain(..);
-                    }
                 }
             }
-        }
     }
 
     pub fn add_test_marcos_to_functions(&mut self) {
